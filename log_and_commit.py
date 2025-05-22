@@ -3,6 +3,7 @@ import os
 from datetime import date
 import subprocess
 from pathlib import Path
+import base64
 
 from dotenv import load_dotenv
 
@@ -27,14 +28,18 @@ LOG_FILE = LOGS_DIR / f"{TODAY}.md"
 # === FETCH WAKATIME DATA ===
 def fetch_wakatime_data():
     url = f"https://wakatime.com/api/v1/users/current/summaries?start={TODAY}&end={TODAY}"
-    headers = {'Authorization': f'Bearer {WAKATIME_API_KEY}'}
+    
+    # Use Basic Auth with base64 encoding of your API key (WakaTime expects this)
+    encoded_key = base64.b64encode(WAKATIME_API_KEY.encode()).decode()
+    headers = {'Authorization': f'Basic {encoded_key}'}
+    
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         data = response.json()
-        total = data['data'][0]['grand_total']['total_seconds'] / 60  # in minutes
+        total = data['data'][0]['grand_total']['total_seconds'] / 60  # convert seconds to minutes
         return round(total)
     else:
-        print("Error fetching WakaTime data:", response.text)
+        print("Error fetching WakaTime data:", response.status_code, response.text)
         return 0
 
 # === LOG ACTIVITY ===
