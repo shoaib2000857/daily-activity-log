@@ -4,7 +4,9 @@ from datetime import date
 import subprocess
 from pathlib import Path
 
-# === CONFIG ===import os
+from dotenv import load_dotenv
+
+load_dotenv()  # loads variables from .env into environment
 
 WAKATIME_API_KEY = os.getenv('WAKATIME_API_KEY')
 if not WAKATIME_API_KEY:
