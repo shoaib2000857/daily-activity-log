@@ -84,11 +84,14 @@ def commit_chunks(total_minutes, existing_blocks):
     for i in range(existing_blocks, chunk_count):
         with open(LOG_FILE, 'a') as f:
             f.write(f"- Activity block #{i+1}\n")
-        subprocess.run(['git', 'add', '.'], cwd=BASE_DIR, shell=True)
-        subprocess.run(['git', 'commit', '-m', f"Log block {i+1} for {TODAY}"], cwd=BASE_DIR, shell=True)
+
+        # Run git commands WITHOUT shell=True since you're passing a list
+        subprocess.run(['git', 'add', '.'], cwd=BASE_DIR)
+        subprocess.run(['git', 'commit', '-m', f"Log block {i+1} for {TODAY}"], cwd=BASE_DIR)
 
     if new_blocks > 0:
-        subprocess.run(['git', 'push'], cwd=BASE_DIR, shell=True)
+        subprocess.run(['git', 'push'], cwd=BASE_DIR)
+
 
 # === MAIN ===
 if __name__ == "__main__":
