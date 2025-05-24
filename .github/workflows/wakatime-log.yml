@@ -1,9 +1,14 @@
-name: Daily WakaTime Log
+name: Daily WakaTime Logger
 
 on:
   schedule:
-    - cron: "0 * * * *"  # Runs daily at 8 PM UTC
-  workflow_dispatch:     # Optional manual trigger
+    - cron: "0 * * * *"   # Every 1 hour
+  workflow_dispatch:
+    inputs:
+      manual_minutes:
+        description: "Manual work time in minutes"
+        required: false
+        default: "0"
 
 jobs:
   log-activity:
@@ -13,7 +18,8 @@ jobs:
       WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -23,10 +29,10 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
-      - name: Run daily log script
-        run: python daily_log.py
+      - name: Run the log script
+        run: python daily_log.py ${{ github.event.inputs.manual_minutes || '0' }}
 
-      - name: Push changes
+      - name: Push commits (if any)
         run: |
-          git pull --rebase  # Ensure up-to-date
+          git pull --rebase
           git push
