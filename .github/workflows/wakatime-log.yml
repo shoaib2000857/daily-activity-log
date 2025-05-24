@@ -2,7 +2,7 @@ name: Daily WakaTime Logger
 
 on:
   schedule:
-    - cron: "12 * * * *"   # At minute 5 past every hour
+    - cron: "20 * * * *"   # At minute 5 past every hour
   workflow_dispatch:
     inputs:
       manual_minutes:
