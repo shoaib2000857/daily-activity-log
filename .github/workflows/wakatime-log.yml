@@ -2,7 +2,7 @@ name: Daily WakaTime Logger
 
 on:
   schedule:
-  - cron: "5 * * * *"   # At minute 5 past every hour
+    - cron: "10 * * * *"   # At minute 5 past every hour
   workflow_dispatch:
     inputs:
       manual_minutes:
@@ -31,6 +31,17 @@ jobs:
 
       - name: Run the log script
         run: python daily_log.py ${{ github.event.inputs.manual_minutes || '0' }}
+
+      - name: Configure git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Show git status
+        run: git status
+
+      - name: Show recent commits
+        run: git log -3 --oneline
 
       - name: Push commits (if any)
         run: |
