@@ -1,0 +1,32 @@
+name: Daily WakaTime Log
+
+on:
+  schedule:
+    - cron: "0 * * * *"  # Runs daily at 8 PM UTC
+  workflow_dispatch:     # Optional manual trigger
+
+jobs:
+  log-activity:
+    runs-on: ubuntu-latest
+
+    env:
+      WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run daily log script
+        run: python daily_log.py
+
+      - name: Push changes
+        run: |
+          git pull --rebase  # Ensure up-to-date
+          git push
