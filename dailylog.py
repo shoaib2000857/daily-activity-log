@@ -1,6 +1,7 @@
 import requests
 import os
 import re
+import sys
 from datetime import date
 import subprocess
 from pathlib import Path
@@ -8,14 +9,19 @@ import base64
 
 # Constants
 MINUTES_PER_COMMIT = 15
-MANUAL_TIME = 0
+
+# Handle optional manual input
+try:
+    MANUAL_TIME = int(sys.argv[1])
+except (IndexError, ValueError):
+    MANUAL_TIME = 0
 
 BASE_DIR = Path(__file__).resolve().parent
 LOGS_DIR = BASE_DIR / 'logs'
 TODAY = date.today().isoformat()
 LOG_FILE = LOGS_DIR / f"{TODAY}.md"
 
-# Get API key from environment
+# Get WakaTime API Key
 WAKATIME_API_KEY = os.getenv('WAKATIME_API_KEY')
 if not WAKATIME_API_KEY:
     print("ERROR: WAKATIME_API_KEY not set.")
@@ -79,7 +85,7 @@ if __name__ == "__main__":
     prev_manual, existing_blocks = read_existing_data()
     total_time, total_manual, existing_blocks = write_log(wakatime_minutes, MANUAL_TIME, prev_manual, existing_blocks)
 
-    # Set git config for GitHub Actions
+    # GitHub Actions bot identity
     subprocess.run(['git', 'config', '--global', 'user.name', 'github-actions[bot]'])
     subprocess.run(['git', 'config', '--global', 'user.email', 'github-actions[bot]@users.noreply.github.com'])
 
